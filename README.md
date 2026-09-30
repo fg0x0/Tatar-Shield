@@ -138,10 +138,15 @@ sent to any server, no telemetry.
 - 📝 User Blacklist / Whitelist.
 
 ## Detected attacks
-Mixed Cyrillic/Latin (IDN homograph, `хacbank.mn`), Cyrillic bank names
-(`ханбанк.мн`), punycode **combined with a brand signal**
-(`xn--80ak6aa92e.com`), Greek/fullwidth confusables (`κhanbanκ.mn`),
-exact brand on a different TLD (`khanbank.net`), typosquat/combosquat.
+
+| Type | Example | Level |
+|---|---|---|
+| Mixed Cyrillic/Latin (IDN homograph) | `хacbank.mn` | 🔴 High |
+| Cyrillic bank name | `ханбанк.мн` | 🔴 High |
+| Punycode + a brand signal | `xn--80ak6aa92e.com` | 🔴 High |
+| Greek / fullwidth confusables | `κhanbanκ.mn`, `ｋｈａｎｂａｎｋ.mn` | 🔴 High |
+| Exact brand, different TLD | `khanbank.net` | 🔴 High |
+| Typosquat / combosquat | `golom6tbank.com`, `mbank-secure.com` | 🟡 Suspicious |
 
 > ℹ️ **Punycode is not a warning on its own.** An `xn--…` host only scores when
 > a brand signal comes with it (Cyrillic bank name, Latin-look-alike label,
