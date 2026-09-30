@@ -6,15 +6,19 @@
  * protect: false — зөвхөн ногоон баталгаа (allowlist), look-alike илрүүлэлтэд ОРОХГҮЙ.
  *   (Түгээмэл үгтэй нэрсийг false болгосон — дэлхийн жинхэнэ сайтуудыг андуурахаас сэргийлнэ.)
  *
+ * aliases: [...] — брэндийн дуураймал хэлбэрүүд (gov-mn, tdbm-mn гэх мэт).
+ *   Зөвхөн skeleton яг тэнцсэн үед ажиллана — Levenshtein хайлтад ОРОХГҮЙ.
+ *   (gov, tdbm мэт 3-4 тэмдэгттэй core уртын шүүлтүүрт баригдаж чаддаггүй.)
+ *
  * Subdomain бодлого: OFFICIAL/PROTECT-д бүртгэгдсэн домайны subdomain-ууд
  * автоматаар allowlist-д ордог (жишээ: *.gov.mn, *.khanbank.mn гэх мэт).
- * isOfficialSubdomain() функцийг ашиглана.
+ * Шалгалтыг idn.js-ийн officialInfo() хийнэ.
  */
 (function () {
   var BANKS = [
     // ---- Монголбанкны лицензтэй 12 арилжааны банк (бүрэн хамгаалалттай) ----
     { name: "Хаан Банк", domains: ["khanbank.com", "khanbank.mn"] },
-    { name: "Худалдаа Хөгжлийн Банк", domains: ["tdbm.mn", "etdbm.mn"] },
+    { name: "Худалдаа Хөгжлийн Банк", domains: ["tdbm.mn", "etdbm.mn"], aliases: ["tdbm-mn"] },
     { name: "Голомт Банк", domains: ["golomtbank.com", "golomtbank.mn", "egolomt.mn"] },
     { name: "Хас Банк (XacBank)", domains: ["xacbank.mn", "xacbank.com"] },
     { name: "Төрийн Банк", domains: ["statebank.mn", "ibank.mn"] },
@@ -30,7 +34,14 @@
     // Тэмдэглэл: gov.mn-г нэмснээр *.gov.mn (mta.gov.mn, ndaatgal.gov.mn гэх мэт)
     // бүгд автоматаар allowlist-д ордог.
     { name: "E-Mongolia", domains: ["e-mongolia.mn"] },
-    { name: "Монгол Улсын Засгийн газар", domains: ["gov.mn"] },
+    { name: "Монгол Улсын Засгийн газар", domains: ["gov.mn"], aliases: ["gov-mn", "govmn"] },
+    // Тэмдэглэл: эдгээрийг хасах санал байсан ч хоёулаа ижил БИШ.
+    //   mta     — core 3 тэмдэгт тул илрүүлэлтэд орж чаддаггүй (mta.com, mta-mn.com
+    //             одоо ч 0/safe). Хасвал зөвхөн mta.mn-ийн ногоон баталгаа л арилна.
+    //   ndaatgal — 8 тэмдэгт, ndaatgal.com / ndaatgal.net-ийг ОДООГООР барьж байгаа
+    //             цорын гагц хамгаалалт. Хасвал тэд 0/safe болно — хасахгүй.
+    // *.gov.mn нь officialInfo()-д аль хэдийн таслагддаг тул mta.gov.mn дээр
+    // хуурамч анхааруулга гарах асуудал байгаагүй. test/run.js-д бичигдсэн.
     { name: "Татварын ерөнхий газар", domains: ["mta.mn"] },
     { name: "Нийгмийн даатгал", domains: ["ndaatgal.mn"] },
 
@@ -39,12 +50,12 @@
     { name: "Complex", domains: ["complex.mn"], protect: false },
     { name: "Trade.mn", domains: ["trade.mn"], protect: false },
     { name: "CoreX", domains: ["corex.mn"], protect: false },
-    { name: "X-Meta", domains: ["x-meta.com"] },
+    { name: "X-Meta", domains: ["x-meta.com"], protect: false },
 
     // ---- Банк бус санхүүгийн байгууллага / Финтек (allowlist only) ----
     { name: "LendMN", domains: ["lend.mn"], protect: false },
-    { name: "Storepay", domains: ["storepay.mn"] },
-    { name: "Ard Credit", domains: ["ardcredit.com"] },
+    { name: "Storepay", domains: ["storepay.mn"], protect: false },
+    { name: "Ard Credit", domains: ["ardcredit.com"], protect: false },
     { name: "Pocket", domains: ["pocket.mn"], protect: false },
     { name: "Most Money", domains: ["most.mn"], protect: false },
     { name: "Toki", domains: ["toki.mn"], protect: false },
@@ -67,7 +78,16 @@
     "богдбанк": "Богд Банк",
     "мбанк": "М Банк (M Bank)",
     "худалдаахөгжлийнбанк": "Худалдаа Хөгжлийн Банк",
-    "үндэснийхөрөнгөоруулалтынбанк": "Үндэсний Хөрөнгө Оруулалтын Банк (NIBank)"
+    "үндэснийхөрөнгөоруулалтынбанк": "Үндэсний Хөрөнгө Оруулалтын Банк (NIBank)",
+    // Төрийн байгууллагууд. Зөвхөн БҮРЭН, онцлог нэрийг бүртгэнэ: "засаг",
+    // "татвар", "даатгал" гэсэн ЕРДИЙН үгсийг бүртгэвэл засаг.mn, татвар.mn,
+    // даатгал.mn, монголдаатгал.mn зэрэг жинхэнэ хаяг дээр хуурамч
+    // анхааруулга гарна (эдгээрийг test/run.js-ийн MUST_BE_SAFE хамгаалдаг).
+    "засгийнгазар": "Монгол Улсын Засгийн газар",
+    "татварынгазар": "Татварын ерөнхий газар",
+    "татварынерөнхийгазар": "Татварын ерөнхий газар",
+    "нийгмийндаатгал": "Нийгмийн даатгал",
+    "нийгмийндаатгалынгазар": "Нийгмийн даатгал"
   };
 
   var OFFICIAL = new Set();   // бүх домэйн — ногоон баталгаа
@@ -80,28 +100,11 @@
     });
   });
 
-  /**
-   * Subdomain wildcard шалгалт.
-   * host нь OFFICIAL-д бүртгэгдсэн домайны subdomain мөн эсэхийг шалгана.
-   * Жишээ: isOfficialSubdomain("mta.gov.mn") → true (gov.mn OFFICIAL-д байгаа)
-   *         isOfficialSubdomain("internet.khanbank.mn") → true
-   */
-  function isOfficialSubdomain(host) {
-    host = host.toLowerCase().replace(/^www\./, "");
-    var parts = host.split(".");
-    for (var i = 1; i < parts.length; i++) {
-      var parent = parts.slice(i).join(".");
-      if (OFFICIAL.has(parent)) return true;
-    }
-    return false;
-  }
-
   var api = {
     BANKS: BANKS,
     OFFICIAL: OFFICIAL,
     PROTECT: PROTECT,
-    CYRILLIC: CYRILLIC,
-    isOfficialSubdomain: isOfficialSubdomain
+    CYRILLIC: CYRILLIC
   };
   if (typeof globalThis !== "undefined") globalThis.TATAR_BANKS = api;
   else if (typeof self !== "undefined") self.TATAR_BANKS = api;
