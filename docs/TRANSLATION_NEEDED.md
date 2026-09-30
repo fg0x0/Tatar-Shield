@@ -16,21 +16,25 @@ wants to report it should not meet an English form.
 
 ## High — end-user facing
 
-| Section | File | Words | Note |
-|---|---|---:|---|
-| *(whole file)* | `.github/ISSUE_TEMPLATE/bug_report.md` | 74 | The path a real user takes to report "my bank's site shows a red warning". Short, and the highest-value 74 words in the repo — the people most likely to file this report are the least likely to read English comfortably. |
-| *(whole file)* | `.github/ISSUE_TEMPLATE/feature_request.md` | 69 | Same audience: "please also cover this bank". |
-
-**Subtotal ≈ 143 words.** Consider a bilingual template (both languages in one
-file) rather than a separate Mongolian one, so GitHub's template picker stays
-simple.
+**Closed 2026-09-30.** Both issue templates are now bilingual, Mongolian first,
+in one file each — so GitHub's template picker stays simple and a reporter meets
+their own language before anything else. The bug template also gained a warning
+never to paste a password, OTP or account number, which the English original did
+not carry and which matters most for exactly the readers who needed the
+translation.
 
 ## Low — contributor-facing
 
+**Closed 2026-09-30:** `.github/PULL_REQUEST_TEMPLATE.md` is bilingual, and
+`docs/permissions.md` gained a Mongolian section. The English half of
+`permissions.md` deliberately stays FIRST, because its primary reader is a
+Chrome Web Store reviewer.
+
+**Still open:**
+
 | Section | File | Words | Note |
 |---|---|---:|---|
-| *(whole file)* | `.github/PULL_REQUEST_TEMPLATE.md` | 75 | Only someone opening a PR sees it. |
-| Our Pledge / Our Standards / Enforcement Responsibilities / Scope / Enforcement / Attribution | `CODE_OF_CONDUCT.md` | 313 | **Do not hand-translate this.** It is the Contributor Covenant, which has an official Mongolian translation — use that rather than writing a second, divergent wording of a document whose exact phrasing is the point. |
+| *(whole file)* | `CODE_OF_CONDUCT.md` | 313 | **Do not hand-translate.** Contributor Covenant v2.1 has an official Mongolian translation — use it rather than writing a second, divergent wording of a document whose exact phrasing is the point. |
 
 ---
 
